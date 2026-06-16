@@ -55,8 +55,7 @@ The [Releases](https://github.com/unpins/telnet/releases) page has standalone bi
 - **Platforms:** Linux, macOS, Windows. There is no clean mingw route — telnet
   is BSD-sockets + termios and inetutils' build is Unix-only — so Windows goes
   through [Cosmopolitan](https://github.com/jart/cosmopolitan), whose libc
-  supplies the POSIX layer; the result is a single `telnet.exe` (a PE32+, apelinked from the cosmocc APE) that
-  links no companion DLLs.
+  supplies the POSIX layer.
 - **One tool:** inetutils builds about thirty programs (ftp, rsh, the `*d`
   servers, …); Debian splits the TELNET client into its own `inetutils-telnet`
   package, and that one binary is all we ship — built with
