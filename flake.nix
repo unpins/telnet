@@ -14,12 +14,13 @@
   # `--disable-clients --disable-servers --enable-telnet` builds the one binary
   # we want; the leftover libtool/man bits for the other tools never get built.
   #
-  # telnet links ncurses (termcap, for the line-mode terminal handling). A
-  # static ncurses would bake an absolute /nix/store terminfo path, but the
-  # engine-Linux ncurses already carries the embedded fallback terminfo baked
-  # centrally in native-overlay/ncurses.nix (gated on `static`), so
-  # pkgsStatic.ncurses is 0-ref and runnable anywhere with no per-package
-  # override here (same as dash/less/psmisc/bc).
+  # telnet links ncurses, and gets nothing from it. Its one termcap call sits
+  # behind HAVE_TGETENT, which `IU_LIB_TERMCAP` (am/libcurses.m4) defines only
+  # in the branch it takes when ncurses is NOT found -- finding ncurses sets
+  # LIBTERMCAP and leaves the macro undefined. So the call is compiled out here
+  # exactly as it is in Debian's build: no terminal database is read and none is
+  # needed. Measured: the else-branch probes never appear in our build log, and
+  # the binary has no ncurses/terminfo/xterm strings at all.
   # Windows goes through Cosmopolitan (mingw can't do telnet's BSD sockets +
   # termios + Unix-only autotools); the recipe and its cosmo-only patches live
   # in the ./cosmo.nix sidecar.
@@ -32,6 +33,11 @@
     lib.mkStandaloneFlake {
       inherit self;
       name = "telnet";
+      # telnet takes a hostname; on a host with no reachable resolver (Android,
+      # a barebones container) musl's getaddrinfo just fails. Opt into the
+      # catalog's DNS fallback, which stays dormant until the user configures
+      # one -- same as curl/links/rsync/whois.
+      dnsFallback = true;
 
       # Build via the unpin-llvm engine + emit a bitcode multicall module. The
       # engine compiles every Linux arch with `clang -target` (no nixpkgs gcc

@@ -33,7 +33,7 @@
  * Vendored copy of the standard BSD <arpa/telnet.h> (byte-identical to the
  * glibc/4.4BSD header). Cosmopolitan's libc does not ship this header, and GNU
  * inetutils' telnet client + libtelnet need it. Dropped into the cosmo build's
- * include path so the cosmo (Windows) cross compiles. See ../telnet/flake.nix.
+ * include path so the cosmo (Windows) cross compiles. See ./cosmo.nix.
  */
 
 #ifndef _ARPA_TELNET_H

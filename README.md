@@ -61,9 +61,10 @@ The [Releases](https://github.com/unpins/telnet/releases) page has standalone bi
   package, and that one binary is all we ship — built with
   `--disable-clients --disable-servers --enable-telnet` so only the TELNET client
   compiles.
-- **Terminfo:** telnet links ncurses for line-mode terminal handling; we swap in
-  an embedded-fallback ncurses so the binary carries its own terminal
-  capabilities and stays runnable anywhere (no `/nix/store` terminfo reference).
+- **No Kerberos:** Debian's `inetutils-telnet` also offers Kerberos login, the
+  `-x` encrypted session and the `auth`/`encrypt` commands. Those are left out
+  here: they do something only against a Kerberos-aware TELNET server, and the
+  encryption on offer is single-DES. Everything else in the client is the same.
 - **Cosmo build notes:** Cosmopolitan's libc is missing a few BSD bits inetutils
   expects, all patched for that target only — it ships no `<arpa/telnet.h>`
   (vendored here as the standard BSD header) or `<arpa/tftp.h>`; it has no
