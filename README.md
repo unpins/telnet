@@ -65,11 +65,3 @@ The [Releases](https://github.com/unpins/telnet/releases) page has standalone bi
   `-x` encrypted session and the `auth`/`encrypt` commands. Those are left out
   here: they do something only against a Kerberos-aware TELNET server, and the
   encryption on offer is single-DES. Everything else in the client is the same.
-- **Cosmo build notes:** Cosmopolitan's libc is missing a few BSD bits inetutils
-  expects, all patched for that target only — it ships no `<arpa/telnet.h>`
-  (vendored here as the standard BSD header) or `<arpa/tftp.h>`; it has no
-  `if_nameindex` family (a struct/prototype shim lets `libinetutils` compile);
-  and it expresses baud rates and the terminal-flush ioctl differently
-  (`DECODE_BAUD` is disabled and `TCFLSH` is replaced with POSIX `tcflush`). The
-  build is also trimmed to telnet's own subdirectories so the ftp/ping/talk/…
-  code (which pulls in yet more Linux-only headers) never compiles.
