@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.7-1] - 2026-09-26
+
 ### Fixed
 
 - On Linux, hostnames now resolve on a machine whose DNS resolver is missing or
