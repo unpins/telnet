@@ -1,0 +1,26 @@
+Declare struct if_nameindex in libinetutils/if_index.c (cosmo only).
+
+if_index.c provides if_nametoindex()/if_nameindex() when the platform lacks
+them (configure leaves HAVE_STRUCT_IF_NAMEINDEX unset on cosmo, whose
+<net/if.h> has no if_nameindex family). The replacement code uses
+`struct if_nameindex`, but only libinetutils.h declares it (under the same
+guard) and if_index.c never includes that header -- glibc/musl get the type
+from <net/if.h>, cosmo does not. Add the same declarations here. telnet itself
+doesn't use the family (only ifconfig does); this only lets libinetutils.a
+compile.
+
+--- a/libinetutils/if_index.c
++++ b/libinetutils/if_index.c
+@@ -34,6 +34,12 @@
+ 
+ #include <sys/ioctl.h>
+ #include <net/if.h>
++#ifndef HAVE_STRUCT_IF_NAMEINDEX
++struct if_nameindex { char *if_name; int if_index; };
++unsigned int if_nametoindex (const char *ifname);
++struct if_nameindex *if_nameindex (void);
++void if_freenameindex (struct if_nameindex *ptr);
++#endif
+ 
+ #ifndef HAVE_STRUCT_IF_NAMEINDEX
+ unsigned int

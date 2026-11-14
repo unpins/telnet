@@ -1,0 +1,36 @@
+Two termios fixes in telnet/sys_bsd.c for cosmo.
+
+1. sys_bsd.c picks "encoded (4.2BSD) vs numeric (4.4BSD)" baud rates via
+   `#if B4800 != 4800` -> DECODE_BAUD, which builds a static termspeeds[]
+   table out of B0/B50/.../B230400. On cosmo those B* are
+   `extern const uint32_t` (runtime values, not macros), so the preprocessor
+   reads B4800 as 0 (DECODE_BAUD on) and the table fails to compile
+   (non-constant static initializers). Terminal line speed is cosmetic for a
+   networked client on Windows, so DECODE_BAUD stays off under
+   __COSMOPOLITAN__ and TerminalSpeeds passes cfgetospeed()/cfgetispeed()
+   through.
+
+2. TerminalFlushOutput falls back to the Linux `TCFLSH` ioctl when
+   <sys/ioctl.h> has no TIOCFLUSH. cosmo has neither ioctl number but does
+   provide the POSIX tcflush()/TCIOFLUSH; use that.
+
+--- a/telnet/sys_bsd.c
++++ b/telnet/sys_bsd.c
+@@ -253,7 +253,7 @@
+ #ifdef	TIOCFLUSH
+   ioctl (fileno (stdout), TIOCFLUSH, &flags);
+ #else
+-  ioctl (fileno (stdout), TCFLSH, &flags);
++  tcflush (fileno (stdout), TCIOFLUSH); (void) flags;
+ #endif
+ }
+ 
+@@ -777,7 +777,7 @@
+ /*
+  * Try to guess whether speeds are "encoded" (4.2BSD) or just numeric (4.4BSD).
+  */
+-#if B4800 != 4800
++#if B4800 != 4800 && !defined __COSMOPOLITAN__
+ # define DECODE_BAUD
+ #endif
+ 

@@ -1,0 +1,25 @@
+Trim the top-level SUBDIRS to telnet's closure (cosmo only).
+
+inetutils builds all its support libraries and program dirs regardless of
+--disable-clients/--disable-servers, which only pick the programs that get
+built and installed. libicmp/libls and the ftp/talk/ping/… dirs drag in more
+BSD headers cosmo lacks (netinet/in_systm.h, …) for code telnet never links.
+Keep exactly gnulib `lib`, libinetutils, libtelnet, the telnet client and
+`man` (which installs the prebuilt telnet.1, no help2man run). Dropping `doc`
+is also why cosmo.nix collapses the outputs to `out`.
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -2552,11 +2552,7 @@
+ EXTRA_DIST = ChangeLog.0 ChangeLog.1 ChangeLog.2 paths summary.sh.in \
+ 	CHECKLIST bootstrap bootstrap.conf bootstrap-funclib.sh \
+ 	$(top_srcdir)/.version
+-SUBDIRS = lib \
+-	libinetutils libtelnet libicmp libls \
+-	src telnet telnetd ftp ftpd talk talkd whois ping ifconfig \
+-	doc man \
+-	tests
++SUBDIRS = lib libinetutils libtelnet telnet man
+ 
+ DISTCLEANFILES = pathdefs.make paths.defs
+ BUILT_SOURCES = $(top_srcdir)/.version
