@@ -11,8 +11,9 @@
   # The `telnet` client from GNU inetutils 2.x. inetutils builds ~30 programs
   # (ftp, rsh, ping, ifconfig, the *d servers, …); Debian splits the telnet
   # client into its own `inetutils-telnet` package and that's all we ship here.
-  # `--disable-clients --disable-servers --enable-telnet` builds the one binary
-  # we want; the leftover libtool/man bits for the other tools never get built.
+  # `--disable-clients --disable-servers --enable-telnet` only picks which
+  # programs get built and installed; the support libraries (gnulib,
+  # libinetutils, libtelnet, …) are compiled regardless.
   #
   # telnet links ncurses, and gets nothing from it. Its one termcap call sits
   # behind HAVE_TGETENT, which `IU_LIB_TERMCAP` (am/libcurses.m4) defines only
@@ -41,17 +42,15 @@
 
       # Build via the unpin-llvm engine + emit a bitcode multicall module. The
       # engine compiles every Linux arch with `clang -target` (no nixpkgs gcc
-      # cross toolchain, no qemu) and self-folds darwin the same way; Windows
-      # stays on cosmo below (engine covers Linux + darwin only).
+      # cross toolchain, no qemu) and self-folds darwin the same way. Windows
+      # stays on cosmo (the ./cosmo.nix sidecar, below).
       engine = "unpin-llvm";
       multicall = {
-        inferLinkInputs = true;
         programs = [{ name = "telnet"; }];
       };
       # Upstream nixpkgs attr is `inetutils` (this build keeps only `telnet`);
       # name it so the engine's stdenv override targets the right attr.
       pkgsAttr = "inetutils";
-      binName = "telnet";
       smoke = [ "--version" ];
       smokePattern = "telnet \\(GNU inetutils\\)";
       build = pkgs:

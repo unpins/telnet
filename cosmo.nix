@@ -1,5 +1,5 @@
 # telnet (GNU inetutils client) for Windows-x86_64 via cosmoStaticCross — a
-# single APE `telnet.exe`. There is no clean mingw route: telnet is BSD sockets
+# single PE32+ `telnet.exe`. There is no clean mingw route: telnet is BSD sockets
 # + termios and inetutils' autotools harness is Unix-only, both of which
 # mingw-w64 lacks. Cosmopolitan's libc provides the POSIX layer configure probes
 # for (sockets, termios, the system headers), so the cosmo cross builds it; the
